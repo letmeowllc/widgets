@@ -13,9 +13,10 @@ export default {
       "Cache-Control": "max-age=3600",
       "Access-Control-Allow-Origin": "*"
     };
-    const ghHeaders = { "User-Agent": "letmeow-widgets" };
-    
-    // Увеличили ширину до 260
+    const ghHeaders = { 
+      "User-Agent": "letmeow-widgets",
+      "Authorization": `Bearer ${env.GITHUB_TOKEN}`
+    };
     const style = `
       <style>
         .title { font-family: 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; fill: ${subtextColor}; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -24,7 +25,6 @@ export default {
         .accent-text { fill: ${accentColor}; }
       </style>
     `;
-
     try {
       if (path === "/followers") {
         const res = await fetch(`https://api.github.com/${isOrg ? 'orgs' : 'users'}/${user}`, { headers: ghHeaders });
@@ -42,7 +42,6 @@ export default {
         `;
         return new Response(svg, { headers });
       }
-
       if (path === "/stars") {
         const reposRes = await fetch(`https://api.github.com/${isOrg ? 'orgs' : 'users'}/${user}/repos?per_page=100`, { headers: ghHeaders });
         if (!reposRes.ok) throw new Error("Repos not found");
@@ -61,7 +60,6 @@ export default {
         `;
         return new Response(svg, { headers });
       }
-
       if (path === "/langs") {
         const reposRes = await fetch(`https://api.github.com/${isOrg ? 'orgs' : 'users'}/${user}/repos?per_page=100`, { headers: ghHeaders });
         if (!reposRes.ok) throw new Error("Repos not found");
@@ -90,10 +88,7 @@ export default {
         topLangs.forEach(([lang, size], i) => {
           const percent = (size / totalSize) * 100;
           const width = (percent / 100) * 260;
-          
-  
           const shortLang = lang.length > 15 ? lang.substring(0, 15) + '...' : lang;
-
           barSvg += `<rect x="${barWidth}" y="0" width="${width}" height="6" fill="${accentColor}" opacity="${opacities[i] || 0.1}" />`;
           legendSvg += `
             <circle cx="0" cy="${i * 18}" r="3" fill="${accentColor}" opacity="${opacities[i] || 0.1}" />
@@ -104,14 +99,13 @@ export default {
         const svg = `
           <svg width="260" height="120" viewBox="0 0 260 120" xmlns="http://www.w3.org/2000/svg">
             ${style}
-            <text x="0" y="20" class="title">Языки</text>
+            <text x="0" y="20" class="title">Популярные языки</text>
             <g transform="translate(0, 30)">${barSvg}</g>
             <g transform="translate(0, 50)">${legendSvg}</g>
           </svg>
         `;
         return new Response(svg, { headers });
       }
-
       if (path === "/repos") {
         const reposRes = await fetch(`https://api.github.com/${isOrg ? 'orgs' : 'users'}/${user}/repos?per_page=100&sort=stars`, { headers: ghHeaders });
         if (!reposRes.ok) throw new Error("Repos not found");
