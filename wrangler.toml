@@ -1,0 +1,6 @@
+name = "widgets"
+main = "src/index.js"
+compatibility_date = "2026-11-13"
+routes = [
+  { pattern = "widgets.letmeow.tech/*", zone_name = "letmeow.tech" }
+]
